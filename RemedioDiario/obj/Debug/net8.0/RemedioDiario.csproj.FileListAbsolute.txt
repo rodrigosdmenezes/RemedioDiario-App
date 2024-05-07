@@ -128,6 +128,7 @@ C:\Users\rsouz\Remediário\RemedioDiario\obj\Debug\net8.0\RemedioDiario.MvcAppli
 C:\Users\rsouz\Remediário\RemedioDiario\obj\Debug\net8.0\RemedioDiario.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\rsouz\Remediário\RemedioDiario\obj\Debug\net8.0\RemedioDiario.RazorAssemblyInfo.cache
 C:\Users\rsouz\Remediário\RemedioDiario\obj\Debug\net8.0\RemedioDiario.RazorAssemblyInfo.cs
+C:\Users\rsouz\Remediário\RemedioDiario\obj\Debug\net8.0\RemedioDiario.sourcelink.json
 C:\Users\rsouz\Remediário\RemedioDiario\obj\Debug\net8.0\RemedioDiario.csproj.CopyComplete
 C:\Users\rsouz\Remediário\RemedioDiario\obj\Debug\net8.0\RemedioDiario.dll
 C:\Users\rsouz\Remediário\RemedioDiario\obj\Debug\net8.0\refint\RemedioDiario.dll

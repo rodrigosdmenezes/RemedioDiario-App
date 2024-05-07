@@ -12,8 +12,8 @@ using RemedioDiario.Data;
 namespace RemedioDiario.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240507132137_InitalMigrations")]
-    partial class InitalMigrations
+    [Migration("20240507184905_InitialMigrations")]
+    partial class InitialMigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,32 +25,13 @@ namespace RemedioDiario.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("RemedioDiario.Entitys.LoginApp", b =>
+            modelBuilder.Entity("MedicamentosApp", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LoginApp");
-                });
-
-            modelBuilder.Entity("RemedioDiario.Entitys.MedicamentosApp", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Comprimido")
                         .HasColumnType("bit");
@@ -72,6 +53,29 @@ namespace RemedioDiario.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MedicamentosApp");
+                });
+
+            modelBuilder.Entity("RegistrarApp", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RegistrarApp");
                 });
 #pragma warning restore 612, 618
         }

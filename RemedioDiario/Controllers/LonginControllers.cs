@@ -16,8 +16,8 @@ namespace LonginControllers.Controllers
             _context = context;
         }
 
-        // POST: api/register
-        [HttpPost("register")]
+        // POST: api/registrar
+        [HttpPost("registrar")]
         public IActionResult Register(RegisterDto registerDto)
         {
             try

@@ -6,13 +6,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RemedioDiario.Migrations
 {
     /// <inheritdoc />
-    public partial class AlteracaoEntitys : Migration
+    public partial class InitialMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "LoginApp");
+            migrationBuilder.CreateTable(
+                name: "MedicamentosApp",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HoraTomar = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Comprimido = table.Column<bool>(type: "bit", nullable: false),
+                    Gotas = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MedicamentosApp", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "RegistrarApp",
@@ -33,21 +47,10 @@ namespace RemedioDiario.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "RegistrarApp");
+                name: "MedicamentosApp");
 
-            migrationBuilder.CreateTable(
-                name: "LoginApp",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LoginApp", x => x.Id);
-                });
+            migrationBuilder.DropTable(
+                name: "RegistrarApp");
         }
     }
 }
