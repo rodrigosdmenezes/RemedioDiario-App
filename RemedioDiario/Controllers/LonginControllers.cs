@@ -40,7 +40,7 @@ namespace LonginControllers.Controllers
                 _context.SaveChanges();
 
                 // Retorna o novo usuário criado
-                return CreatedAtAction(nameof(GetUserById), new { id = newUser.Id }, newUser);
+                return Ok(newUser);
             }
             catch (Exception ex)
             {
@@ -54,38 +54,32 @@ namespace LonginControllers.Controllers
         {
             try
             {
-                // Busca pelo usuário pelo email na tabela RegistrarApp
                 var user = _context.RegistrarApp.FirstOrDefault(u => u.Email == login.Email);
 
-                // Verifica se o usuário foi encontrado
-                if (user == null)
+                if (user == null || user.Password != login.Password)
                 {
                     return Unauthorized("Credenciais inválidas.");
                 }
 
-                // Verifica se a senha está correta
-                if (user.Password != login.Password)
-                {
-                    return Unauthorized("Credenciais inválidas.");
-                }
-
-                // Retorna sucesso e os dados do usuário
                 return Ok(user);
             }
             catch (Exception ex)
             {
-                // Em caso de erro, retorna uma resposta de erro
                 return StatusCode(500, $"Ocorreu um erro ao fazer login: {ex.Message}");
             }
         }
 
         // POST: api/resetpassword
         [HttpPost("resetpassword")]
-        public IActionResult ResetPassword(ResetPasswordDto resetPasswordDto)
+        public IActionResult ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
         {
             try
             {
-                // Verifica se o usuário com o email fornecido existe na tabela RegistrarApp
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
                 var user = _context.RegistrarApp.FirstOrDefault(u => u.Email == resetPasswordDto.Email);
 
                 if (user == null)
