@@ -3,7 +3,8 @@ import Welcome from "../pages/Welcome";
 import SignIn from "../pages/SignIn";
 import SignUp from "../pages/SignUp";
 import Reset from "../pages/Reset/Reset";
-import Menu from "../pages/Menu/Menu"
+import Menu from "../pages/Menu/Menu";
+import ListMed from "../pages/ListMed/ListMed"
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +37,11 @@ export default function Routes() {
         component={Menu}
         options={{ headerShown: false }}
         />    
+        <Stack.Screen 
+        name="ListMed"
+        component={ListMed}
+        options={{ headerShown: false }}
+        />   
     </Stack.Navigator>
   );
 }

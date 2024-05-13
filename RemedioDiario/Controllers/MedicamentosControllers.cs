@@ -14,6 +14,25 @@ namespace RemedioDiario.Controllers
             _context = context;
         }
 
+        // GET: api/Medicamentos
+        [HttpGet("Medicamentos")]
+        public IActionResult GetMedicamentos()
+        {
+            try
+            {
+                // Obtém todos os medicamentos cadastrados no banco de dados
+                var medicamentos = _context.MedicamentosApp.ToList();
+
+                // Retorna uma resposta com a lista de medicamentos
+                return Ok(medicamentos);
+            }
+            catch (Exception ex)
+            {
+                // Em caso de erro, retorna uma resposta de erro com o detalhe do erro
+                return StatusCode(500, $"Ocorreu um erro ao recuperar os medicamentos: {ex.Message}");
+            }
+        }
+
         // POST: api/Medicamentos
         [HttpPost("Medicamentos")]
         public IActionResult PostMedicamento(MedicamentosApp medicamentosApp)
@@ -52,9 +71,10 @@ namespace RemedioDiario.Controllers
                 // Atualiza as propriedades do medicamento com base nos dados fornecidos no DTO
                 medicamento.Nome = medicamentoDto.Nome;
                 medicamento.Descricao = medicamentoDto.Descricao;
-                medicamento.HoraTomar = medicamentoDto.HoraTomar;
-                medicamento.Comprimido = medicamentoDto.Comprimido;
-                medicamento.Gotas = medicamentoDto.Gotas;
+                medicamento.Quantidade = medicamentoDto.Quantidade;
+                medicamento.Tipo = medicamentoDto.Tipo;
+                medicamento.Data = medicamentoDto.Data;
+                medicamento.Hora = medicamentoDto.Hora;
 
                 // Salva as alterações no banco de dados
                 _context.SaveChanges();

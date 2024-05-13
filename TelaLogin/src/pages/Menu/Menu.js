@@ -1,128 +1,123 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
-import { CheckBox } from "react-native-elements";
-import { Calendar } from "react-native-calendars";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import axios from 'axios';
+import { Alert } from 'react-native';
 
-export default function Menu() {
+
+export default function Menu({ navigation }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [types, setTypes] = useState([
-    { label: "Comprimido", value: "comprimido", checked: false },
-    { label: "Gotas", value: "gotas", checked: false },
-  ]);
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [time, setTime] = useState(new Date());
-  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
 
-  const handleSave = () => {
-    // Aqui você pode enviar os dados para o backend para salvar no banco de dados
-    console.log("Nome:", name);
-    console.log("Descrição:", description);
-    console.log("Quantidade:", quantity);
-    console.log("Tipos selecionados:");
-    types.forEach((type) => {
-      if (type.checked) {
-        console.log("- " + type.label);
+  const handleSave = async () => {
+    try {
+      const response = await axios.post('http://localhost:5122/api/Medicamentos', {
+        Nome: name,
+        Descricao: description,
+        Quantidade: quantity,
+        Tipo: selectedType,
+        Data: selectedDate,
+        Hora: selectedTime
+      });
+      if (response.status === 200) {
+        Alert.alert("Sucesso", "Medicamento cadastrado com sucesso.");
+      } else {
+        Alert.alert("Erro", "Erro ao cadastrar medicamento. Por favor, tente novamente.");
       }
-    });
-    console.log("Data:", date);
-    console.log("Hora:", time);
-  };
-
-  const handleDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDatePicker(false);
-    setDate(currentDate);
-  };
-
-  const handleTimeChange = (event, selectedTime) => {
-    const currentTime = selectedTime || time;
-    setShowTimePicker(false);
-    setTime(currentTime);
-  };
-
-  const handleCheckboxChange = (value) => {
-    const updatedTypes = types.map((type) =>
-      type.value === value ? { ...type, checked: !type.checked } : type
-    );
-    setTypes(updatedTypes);
+    } catch (error) {
+      console.log(error)
+      Alert.alert("Erro", "Ocorreu um erro ao cadastrar medicamento. Por favor, tente novamente.");
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Cadastrar Medicamento</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome"
-        value={name}
-        onChangeText={setName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Descrição"
-        value={description}
-        onChangeText={setDescription}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Quantidade"
-        value={quantity}
-        onChangeText={setQuantity}
-        keyboardType="numeric"
-      />
+      <View style={styles.containerHeader}>
+        <Text style={styles.message}>Cadastrar Medicamento</Text>
+      </View>
 
-      <Text>Selecione o tipo:</Text>
-      {types.map((type) => (
-        <View key={type.value} style={styles.checkboxContainer}>
-          <Text style={styles.label}>{type.label}</Text>
-          <CheckBox
-            checked={type.checked}
-            onPress={() => handleCheckboxChange(type.value)}
+      <View style={styles.containerForm}>
+        <Text style={styles.title}>Nome</Text>
+        <View style={styles.inputContainer}>
+          <Icon name="medical-bag" size={20} color="#777" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Digite o nome"
+            value={name}
+            onChangeText={setName}
           />
         </View>
-      ))}
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => setShowDatePicker(true)}
-      >
-        <Text style={styles.buttonText}>Selecionar data</Text>
-      </TouchableOpacity>
-      {showDatePicker && (
-        <Calendar
-          testID="datePicker"
-          current={date}
-          onDayPress={(day) => {
-            handleDateChange(null, new Date(day.timestamp));
-          }}
-        />
-      )}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => setShowTimePicker(true)}
-      >
-        <Text style={styles.buttonText}>Selecionar hora</Text>
-      </TouchableOpacity>
-      {showTimePicker && (
-        <Calendar
-          testID="timePicker"
-          current={time}
-          onDayPress={(day) => {
-            handleTimeChange(null, new Date(day.timestamp));
-          }}
-        />
-      )}
-      <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>Salvar</Text>
-      </TouchableOpacity>
+        <Text style={styles.title}>Descrição</Text>
+        <View style={styles.inputContainer}>
+          <Icon name="pencil" size={20} color="#777" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Digite a descrição"
+            value={description}
+            onChangeText={setDescription}
+          />
+        </View>
+
+        <Text style={styles.title}>Quantidade</Text>
+        <View style={styles.inputContainer}>
+          <Icon name="flask" size={20} color="#777" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Digite a quantidade"
+            value={quantity}
+            onChangeText={setQuantity}
+            keyboardType="numeric"
+          />
+        </View>
+
+        <Text style={styles.title}>Tipo</Text>
+        <View style={styles.inputContainer}>
+          <Icon name="needle" size={20} color="#777" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Informe o tipo, se é Gotas, Comprimido ou Vacina"
+            value={selectedType}
+            onChangeText={setSelectedType}
+          />
+        </View>
+
+        <Text style={styles.title}>Data</Text>
+        <View style={styles.inputContainer}>
+          <Icon name="calendar" size={20} color="#777" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Selecione a data (DD/MM/AAAA)"
+            value={selectedDate}
+            onChangeText={setSelectedDate}
+          />
+        </View>
+
+        <Text style={styles.title}>Hora</Text>
+        <View style={styles.inputContainer}>
+          <Icon name="clock-outline" size={20} color="#777" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Selecione a hora (HH:MM)"
+            value={selectedTime}
+            onChangeText={setSelectedTime}
+          />
+        </View>
+
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity style={[styles.button, styles.buttonSalvar]} onPress={handleSave}>
+            <Text style={styles.buttonText}>Salvar</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={[styles.button, styles.buttonVerMedicamentos]} onPress={() => navigation.navigate('ListMed')}>
+            <Text style={styles.buttonText}>Ver Medicamentos Cadastrados</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }
@@ -130,41 +125,67 @@ export default function Menu() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#38A69D",
+  },
+  containerHeader: {
+    marginTop: "14%",
+    marginBottom: "8%",
+    paddingHorizontal: "5%",
+  },
+  message: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#FFF",
+    marginTop: 28,
+  },
+  containerForm: {
+    backgroundColor: "#FFF",
+    flex: 1,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    paddingHorizontal: "5%",
+    paddingTop: 20,
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
+    marginTop: 20,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   input: {
+    borderBottomWidth: 1,
     height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    paddingHorizontal: 10,
+    marginBottom: 12,
+    fontSize: 16,
+    flex: 1,
+  },
+  icon: {
+    marginRight: 10,
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
   },
   button: {
     backgroundColor: "#38A69D",
-    paddingVertical: 12,
-    borderRadius: 5,
-    marginBottom: 15,
+    width: "48%",
+    borderRadius: 4,
+    paddingVertical: 8,
+    justifyContent: "center",
     alignItems: "center",
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 16,
+    color: "#FFF",
+    fontSize: 18,
     fontWeight: "bold",
   },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 10,
+  buttonSalvar: {
+    marginRight: '2%',
   },
-  label: {
-    marginRight: 8,
-  },
+  buttonVerMedicamentos: {
+    marginLeft: '2%',
+  }
 });
