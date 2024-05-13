@@ -33,6 +33,25 @@ namespace RemedioDiario.Controllers
             }
         }
 
+        // GET: api/Medicamentos/Ids
+        [HttpGet("MedicamentosIds")]
+        public IActionResult GetMedicamentoIds()
+        {
+            try
+            {
+                // Obtém apenas os IDs dos medicamentos
+                var medicamentoIds = _context.MedicamentosApp.Select(m => m.Id).ToList();
+                
+                // Retorna os IDs dos medicamentos
+                return Ok(medicamentoIds);
+            }
+            catch (Exception ex)
+            {
+                // Em caso de erro, retorna uma resposta de erro com o detalhe do erro
+                return StatusCode(500, $"Ocorreu um erro ao obter os IDs dos medicamentos: {ex.Message}");
+            }
+        }
+
         // POST: api/Medicamentos
         [HttpPost("Medicamentos")]
         public IActionResult PostMedicamento(MedicamentosApp medicamentosApp)
@@ -89,7 +108,7 @@ namespace RemedioDiario.Controllers
             }
         }
         // DELETE: api/Medicamentos/{id}
-        [HttpDelete("Medicamentos/{id}")]
+        [HttpDelete("excluir/{id}")]
         public IActionResult DeleteMedicamento(int id)
         {
             try
