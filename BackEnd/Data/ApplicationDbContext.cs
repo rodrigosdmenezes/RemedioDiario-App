@@ -1,8 +1,6 @@
 ﻿namespace RemedioDiario.Data
 {
     using Microsoft.EntityFrameworkCore;
-    using RemedioDiario.Entitys;
-
 
     public class ApplicationDbContext : DbContext
     {

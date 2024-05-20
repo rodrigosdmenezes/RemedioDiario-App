@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\rsouz\\Remediário\\RemedioDiario\\RemedioDiario.csproj": {}
+    "C:\\Users\\rsouz\\RemedioDiario\\BackEnd\\RemedioDiario.csproj": {}
   },
   "projects": {
-    "C:\\Users\\rsouz\\Remediário\\RemedioDiario\\RemedioDiario.csproj": {
+    "C:\\Users\\rsouz\\RemedioDiario\\BackEnd\\RemedioDiario.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rsouz\\Remediário\\RemedioDiario\\RemedioDiario.csproj",
+        "projectUniqueName": "C:\\Users\\rsouz\\RemedioDiario\\BackEnd\\RemedioDiario.csproj",
         "projectName": "RemedioDiario",
-        "projectPath": "C:\\Users\\rsouz\\Remediário\\RemedioDiario\\RemedioDiario.csproj",
+        "projectPath": "C:\\Users\\rsouz\\RemedioDiario\\BackEnd\\RemedioDiario.csproj",
         "packagesPath": "C:\\Users\\rsouz\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\rsouz\\Remediário\\RemedioDiario\\obj\\",
+        "outputPath": "C:\\Users\\rsouz\\RemedioDiario\\BackEnd\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\rsouz\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -40,6 +40,14 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.4, )"
+            },
+            "Microsoft.AspNetCore.Authorization": {
+              "target": "Package",
+              "version": "[8.0.5, )"
+            },
             "Microsoft.AspNetCore.Identity": {
               "target": "Package",
               "version": "[2.2.0, )"
@@ -50,7 +58,7 @@
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[8.0.4, )"
+              "version": "[8.0.5, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",

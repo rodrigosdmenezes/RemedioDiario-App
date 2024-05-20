@@ -69,7 +69,7 @@ export default function ListaMedicamentos() {
 
   const handleDeleteItem = async (medicamentoId) => {
     try {
-      const response = await axios.delete(`http://localhost:5122/api/Medicamentos/${medicamentoId}`);
+      const response = await axios.delete(`http://localhost:5122/api/Medicamentos/${medicamentoId},`, editedFields);
       if (response.status === 200) {
         Alert.alert("Sucesso", "Medicamento excluído com sucesso.");
         fetchMedicamentos();

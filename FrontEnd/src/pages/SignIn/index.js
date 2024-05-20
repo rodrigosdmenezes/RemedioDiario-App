@@ -10,6 +10,8 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -24,20 +26,37 @@ export default function SignIn() {
     }
 
     try {
-      const response = await axios.post('http://localhost:5122/api/login', {
+      const tokenResponse = await axios.post('http://localhost:5122/api/auth', {
         email: email,
         password: password
       });
-      if (response.status === 200) {
-        Alert.alert("Sucesso", "Login realizado com sucesso.");
-        navigation.navigate("Menu");
+
+      if (tokenResponse.status === 200 && tokenResponse.data && tokenResponse.data.token) {
+        const token = tokenResponse.data.token;
+        console.log("token:", token);
+        await AsyncStorage.setItem('token', token);
+
+        const userResponse = await axios.post('http://localhost:5122/api/login', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+          },
+
+        });
+
+        console.log(userResponse)
+
+        if (userResponse.status === 200) {
+          navigation.navigate("Menu");
+        } else {
+          Alert.alert("Erro", "Credenciais inválidas. Por favor, verifique seu email e senha.");
+        }
       } else {
-        Alert.alert("Erro", "Credenciais inválidas. Por favor, verifique seu email e senha.");
+        Alert.alert("Erro", "Ocorreu um erro ao fazer login. Por favor, tente novamente.");
       }
     } catch (error) {
+      console.log(error)
       Alert.alert("Erro", "Ocorreu um erro ao fazer login. Por favor, tente novamente.");
     }
-
   };
 
   const handleTogglePasswordVisibility = () => {

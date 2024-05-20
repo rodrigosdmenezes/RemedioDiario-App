@@ -1,4 +1,10 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RemedioDiario.Data;
 using RemedioDiario.Entitys;
 
@@ -10,25 +16,28 @@ namespace LonginControllers.Controllers
     public class LoginController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _config;
 
-        public LoginController(ApplicationDbContext context)
+        public LoginController(IConfiguration config, ApplicationDbContext context)
         {
+            _config = config;
+
             _context = context;
         }
 
+
         // POST: api/registrar
         [HttpPost("registrar")]
+        [AllowAnonymous]
         public IActionResult Register(RegisterDto registerDto)
         {
             try
             {
-                // Verifica se já existe um usuário com o mesmo email
                 if (_context.RegistrarApp.Any(u => u.Email == registerDto.Email))
                 {
                     return Conflict("O email informado já está em uso.");
                 }
 
-                // Cria um novo usuário
                 var newUser = new RegistrarApp
                 {
                     Nome = registerDto.Nome,
@@ -39,7 +48,6 @@ namespace LonginControllers.Controllers
                 _context.RegistrarApp.Add(newUser);
                 _context.SaveChanges();
 
-                // Retorna o novo usuário criado
                 return Ok(newUser);
             }
             catch (Exception ex)
@@ -50,18 +58,22 @@ namespace LonginControllers.Controllers
 
         // POST: api/login
         [HttpPost("login")]
-        public IActionResult Login(LoginApp login)
+        [Authorize]
+        public async Task<IActionResult> Login([FromBody] LoginApp model)
         {
             try
             {
-                var user = _context.RegistrarApp.FirstOrDefault(u => u.Email == login.Email);
+                var user = await _context.RegistrarApp.FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
 
-                if (user == null || user.Password != login.Password)
+                if (user == null)
                 {
                     return Unauthorized("Credenciais inválidas.");
                 }
 
-                return Ok(user);
+                // Se chegou aqui, o usuário está autenticado com sucesso
+                // Faça o que for necessário e retorne uma resposta apropriada
+
+                return Ok("Usuário autenticado com sucesso.");
             }
             catch (Exception ex)
             {
@@ -69,6 +81,7 @@ namespace LonginControllers.Controllers
             }
         }
 
+        [AllowAnonymous]
         // POST: api/resetpassword
         [HttpPost("resetpassword")]
         public IActionResult ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
@@ -87,24 +100,21 @@ namespace LonginControllers.Controllers
                     return NotFound("Usuário não encontrado.");
                 }
 
-                // Atualiza a senha do usuário com a nova senha fornecida
                 user.Password = resetPasswordDto.NewPassword;
 
-                // Salva as mudanças no banco de dados
                 _context.SaveChanges();
 
                 return Ok("Senha resetada com sucesso.");
             }
             catch (Exception ex)
             {
-                // Em caso de erro, retorna uma resposta de erro
                 return StatusCode(500, $"Ocorreu um erro ao redefinir a senha: {ex.Message}");
             }
         }
-        // Método auxiliar para obter um usuário por ID
         private RegistrarApp GetUserById(Guid id)
         {
             return _context.RegistrarApp.FirstOrDefault(u => u.Id == id);
         }
+
     }
 }
