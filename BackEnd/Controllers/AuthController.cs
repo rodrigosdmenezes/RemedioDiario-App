@@ -7,6 +7,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 
@@ -38,11 +39,12 @@ namespace RemedioDiario.Controllers
 
             return Ok(new { Token = token });
         }
+
         private string GenerateToken(RegistrarApp user)
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Email.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Email),
                 new Claim(ClaimTypes.Name, user.Email)
             };
 
@@ -51,7 +53,7 @@ namespace RemedioDiario.Controllers
 
             var token = new JwtSecurityToken(
                 _config["Jwt:Issuer"],
-                _config["Jwt:Issuer"],
+                _config["Jwt:Audience"],
                 claims,
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: creds

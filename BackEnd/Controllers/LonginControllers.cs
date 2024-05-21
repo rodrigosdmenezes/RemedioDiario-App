@@ -13,6 +13,7 @@ namespace LonginControllers.Controllers
 {
     [Route("api")]
     [ApiController]
+    [Authorize]
     public class LoginController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -55,6 +56,7 @@ namespace LonginControllers.Controllers
                 return StatusCode(500, $"Ocorreu um erro ao criar o usuário: {ex.Message}");
             }
         }
+
 
         // POST: api/login
         [HttpPost("login")]

@@ -12,7 +12,6 @@ import { useNavigation } from "@react-navigation/native";
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,17 +32,25 @@ export default function SignIn() {
 
       if (tokenResponse.status === 200 && tokenResponse.data && tokenResponse.data.token) {
         const token = tokenResponse.data.token;
-        console.log("token:", token);
+        console.log("Token recebido:", token);
+
         await AsyncStorage.setItem('token', token);
 
-        const userResponse = await axios.post('http://localhost:5122/api/login', {
-        headers: {
-            'Authorization': `Bearer ${token}`
+        // Enviando o token no cabeçalho da solicitação para o back-end
+        const userResponse = await axios.post(
+          'http://localhost:5122/api/login',
+          {
+            email: email,
+            password: password
           },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
 
-        });
-
-        console.log(userResponse)
+        console.log("Resposta do usuário:", userResponse);
 
         if (userResponse.status === 200) {
           navigation.navigate("Menu");
@@ -54,7 +61,7 @@ export default function SignIn() {
         Alert.alert("Erro", "Ocorreu um erro ao fazer login. Por favor, tente novamente.");
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       Alert.alert("Erro", "Ocorreu um erro ao fazer login. Por favor, tente novamente.");
     }
   };
