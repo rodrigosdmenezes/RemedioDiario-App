@@ -42,10 +42,13 @@ namespace RemedioDiario.Controllers
 
         private string GenerateToken(RegistrarApp user)
         {
+            var userId = user.Id.ToString(); // Convertendo o ID do usuário para string
+            var userEmail = user.Email;
+
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Email),
-                new Claim(ClaimTypes.Name, user.Email)
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Name, userEmail)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:SecretKey"]));

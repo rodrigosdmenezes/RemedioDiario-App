@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button, Platform } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
-import { Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Menu({ navigation }) {
   const [name, setName] = useState("");
@@ -14,6 +14,23 @@ export default function Menu({ navigation }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedTime, setSelectedTime] = useState("");
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+    const getToken = async () => {
+      try {
+        const userToken = await AsyncStorage.getItem('token');
+        if (userToken !== null) {
+          setToken(userToken);
+        }
+      } catch (error) {
+        console.error('Erro ao recuperar o token:', error);
+      }
+    };
+
+    
+    getToken();
+  }, []);
 
   const handleSave = async () => {
     try {
@@ -22,9 +39,16 @@ export default function Menu({ navigation }) {
         Descricao: description,
         Quantidade: quantity,
         Tipo: selectedType,
-        Data: selectedDate.toLocaleDateString('pt-BR'), // Alterado para formato brasileiro
+        Data: selectedDate.toLocaleDateString('pt-BR'),
         Hora: selectedTime
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
+      
+      console.log(token);
+
       if (response.status === 200) {
         Alert.alert("Sucesso", "Medicamento cadastrado com sucesso.");
       } else {

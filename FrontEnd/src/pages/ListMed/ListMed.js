@@ -1,35 +1,53 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput, Alert } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import axios from "axios";
-import { Alert } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ListaMedicamentos() {
   const [medicamentos, setMedicamentos] = useState([]);
   const [editingItemId, setEditingItemId] = useState(null);
   const [editedFields, setEditedFields] = useState({});
+  const [token, setToken] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchMedicamentos();
+    const fetchData = async () => {
+      await getToken();
+      setLoading(false);
+    };
+    fetchData();
   }, []);
 
-  const fetchMedicamentos = async () => {
+  const getToken = async () => {
     try {
-      const response = await axios.get("http://localhost:5122/api/Medicamentos");
+      const userToken = await AsyncStorage.getItem('token');
+      if (userToken) {
+        setToken(userToken);
+        fetchMedicamentos(userToken);
+      } else {
+        Alert.alert('Erro', 'Token não encontrado.');
+      }
+    } catch (error) {
+      console.error('Erro ao recuperar o token:', error);
+    }
+  };
+
+  const fetchMedicamentos = async (userToken) => {
+    try {
+      const response = await axios.get("http://localhost:5122/api/Medicamentos", {
+        headers: {
+          Authorization: `Bearer ${userToken}`
+        }
+      });
       if (response.status === 200) {
         setMedicamentos(response.data);
       } else {
-        Alert.alert(
-          "Erro",
-          "Erro ao carregar os medicamentos. Por favor, tente novamente."
-        );
+        Alert.alert("Erro", "Erro ao carregar os medicamentos. Por favor, tente novamente.");
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert(
-        "Erro",
-        "Ocorreu um erro ao carregar os medicamentos. Por favor, tente novamente."
-      );
+      console.error(error);
+      Alert.alert("Erro", "Ocorreu um erro ao carregar os medicamentos. Por favor, tente novamente.");
     }
   };
 
@@ -47,17 +65,21 @@ export default function ListaMedicamentos() {
 
   const handleSaveEdit = async (medicamentoId) => {
     try {
-      const response = await axios.put(`http://localhost:5122/api/Medicamentos/${medicamentoId}`, editedFields);
+      const response = await axios.put(`http://localhost:5122/api/Medicamentos/${medicamentoId}`, editedFields, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       if (response.status === 200) {
         Alert.alert("Sucesso", "Medicamento atualizado com sucesso.");
-        fetchMedicamentos();
+        fetchMedicamentos(token);
         setEditingItemId(null);
         setEditedFields({});
       } else {
         Alert.alert("Erro", "Erro ao atualizar medicamento. Por favor, tente novamente.");
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       Alert.alert("Erro", "Ocorreu um erro ao atualizar medicamento. Por favor, tente novamente.");
     }
   };
@@ -69,15 +91,19 @@ export default function ListaMedicamentos() {
 
   const handleDeleteItem = async (medicamentoId) => {
     try {
-      const response = await axios.delete(`http://localhost:5122/api/Medicamentos/${medicamentoId},`, editedFields);
+      const response = await axios.delete(`http://localhost:5122/api/Medicamentos/${medicamentoId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       if (response.status === 200) {
         Alert.alert("Sucesso", "Medicamento excluído com sucesso.");
-        fetchMedicamentos();
+        fetchMedicamentos(token);
       } else {
         Alert.alert("Erro", "Erro ao excluir medicamento. Por favor, tente novamente.");
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       Alert.alert("Erro", "Ocorreu um erro ao excluir medicamento. Por favor, tente novamente.");
     }
   };
@@ -166,12 +192,16 @@ export default function ListaMedicamentos() {
       <View style={styles.containerHeader}>
         <Text style={styles.message}>Remédios Cadastrados</Text>
       </View>
-      <FlatList
-        data={medicamentos}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        style={styles.flatList}
-      />
+      {loading ? (
+        <Text style={styles.loadingText}>Carregando...</Text>
+      ) : (
+        <FlatList
+          data={medicamentos}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          style={styles.flatList}
+        />
+      )}
     </View>
   );
 }
@@ -232,5 +262,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginBottom: 5,
     padding: 5,
+  },
+  loadingText: {
+    textAlign: 'center',
+    color: '#FFF',
+    marginTop: 20,
+    fontSize: 18,
   },
 });

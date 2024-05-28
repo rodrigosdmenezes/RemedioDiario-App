@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RemedioDiario")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6a2c538e31ba674a443cc7831109bdd06187b579")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f1069c40edfa71613173d1121eb022e2e21490c9")]
 [assembly: System.Reflection.AssemblyProductAttribute("RemedioDiario")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RemedioDiario")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

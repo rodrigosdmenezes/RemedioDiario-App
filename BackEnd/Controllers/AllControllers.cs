@@ -116,49 +116,41 @@ namespace LonginControllers.Controllers
         {
             return _context.RegistrarApp.FirstOrDefault(u => u.Id == id);
         }
-
-                // GET: api/Medicamentos
-        [HttpGet("Medicamentos")]
-        public IActionResult GetMedicamentos()
-        {
-            try
-            {
-                var medicamentos = _context.MedicamentosApp.ToList();
-
-                return Ok(medicamentos);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Ocorreu um erro ao recuperar os medicamentos: {ex.Message}");
-            }
-        }       
         
-        [HttpGet("MedicamentosIds")]
-        public IActionResult GetMedicamentoIds()
-        {
-            try
-            {
-                var medicamentoIds = _context.MedicamentosApp.Select(m => m.Id).ToList();
-
-                return Ok(medicamentoIds);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Ocorreu um erro ao obter os IDs dos medicamentos: {ex.Message}");
-            }
-        }
-
         // POST: api/Medicamentos
+        [Authorize]
         [HttpPost("Medicamentos")]
         public IActionResult PostMedicamento(MedicamentosApp medicamentosApp)
         {
             try
             {
-                _context.MedicamentosApp.Add(medicamentosApp);
+                // Recuperar o ID do usuário autenticado a partir do token JWT
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+                // Verificar se o valor recuperado não é nulo e se pode ser convertido para Guid
+                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+                {
+                    // Se não for possível recuperar o ID do usuário ou se a conversão falhar, retornar um erro de autorização
+                    return Unauthorized("Usuário não autenticado.");
+                }
+
+                // Criar uma instância de MedicamentoApp e atribuir os valores do DTO
+                var medicamentoApp = new MedicamentosApp
+                {
+                    Nome = medicamentosApp.Nome,
+                    Descricao = medicamentosApp.Descricao,
+                    Quantidade = medicamentosApp.Quantidade,
+                    Tipo = medicamentosApp.Tipo,
+                    Data = medicamentosApp.Data,
+                    Hora = medicamentosApp.Hora,
+                    UserId = userId // Associar o ID do usuário ao medicamento
+                };
+
+                // Adicionar o medicamento ao contexto e salvar as alterações
+                _context.MedicamentosApp.Add(medicamentoApp);
                 _context.SaveChanges();
 
-                return Ok(medicamentosApp);
+                return Ok(medicamentoApp);
             }
             catch (Exception ex)
             {
@@ -166,18 +158,59 @@ namespace LonginControllers.Controllers
             }
         }
 
+        // GET: api/Medicamentos
+        [Authorize]
+        [HttpGet("Medicamentos")]        
+        public IActionResult GetMedicamentos()
+        {
+            try
+            {
+                // Recuperar o ID do usuário autenticado a partir do token JWT
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                // Verificar se o valor recuperado não é nulo e se pode ser convertido para Guid
+                if (!Guid.TryParse(userIdString, out var userId))
+                {
+                    // Se não for possível recuperar o ID do usuário, retornar um erro de autorização
+                    return Unauthorized("Usuário não autenticado.");
+                }
+
+                // Recuperar os medicamentos associados a esse usuário
+                var medicamentos = _context.MedicamentosApp.Where(m => m.UserId == userId).ToList();
+
+                return Ok(medicamentos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro ao recuperar os medicamentos: {ex.Message}");
+            }
+        }
+
         // PUT: api/Medicamentos/{id}
         [HttpPut("Medicamentos/{id}")]
+        [Authorize]
         public IActionResult PutMedicamento(int id, MedicamentoDto medicamentoDto)
         {
             try
             {
-                var medicamento = _context.MedicamentosApp.FirstOrDefault(m => m.Id == id);
-                if (medicamento == null)
+                // Recuperar o ID do usuário autenticado a partir do token JWT
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                // Verificar se o valor recuperado não é nulo e se pode ser convertido para Guid
+                if (!Guid.TryParse(userIdString, out var userId))
                 {
-                    return NotFound("Medicamento não encontrado.");
+                    // Se não for possível recuperar o ID do usuário, retornar um erro de autorização
+                    return Unauthorized("Usuário não autenticado.");
                 }
 
+                // Verificar se o medicamento com o ID fornecido pertence ao usuário autenticado
+                var medicamento = _context.MedicamentosApp.FirstOrDefault(m => m.Id == id && m.UserId == userId);
+                if (medicamento == null)
+                {
+                    return NotFound("Medicamento não encontrado ou não pertence ao usuário autenticado.");
+                }
+
+                // Atualizar os detalhes do medicamento
                 medicamento.Nome = medicamentoDto.Nome;
                 medicamento.Descricao = medicamentoDto.Descricao;
                 medicamento.Quantidade = medicamentoDto.Quantidade;
@@ -194,21 +227,33 @@ namespace LonginControllers.Controllers
                 return StatusCode(500, $"Ocorreu um erro ao atualizar o medicamento: {ex.Message}");
             }
         }
+
         // DELETE: api/Medicamentos/{id}
         [HttpDelete("Medicamentos/{id}")]
+        [Authorize]
         public IActionResult DeleteMedicamento(int id)
         {
             try
             {
-                var medicamentoParaExcluir = _context.MedicamentosApp.FirstOrDefault(m => m.Id == id);
+                // Recuperar o ID do usuário autenticado a partir do token JWT
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                if (medicamentoParaExcluir == null)
+                // Verificar se o valor recuperado não é nulo e se pode ser convertido para Guid
+                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
                 {
-                    return NotFound($"Medicamento com ID {id} não encontrado.");
+                    // Se não for possível recuperar o ID do usuário ou se a conversão falhar, retornar um erro de autorização
+                    return Unauthorized("Usuário não autenticado.");
                 }
 
-                _context.MedicamentosApp.Remove(medicamentoParaExcluir);
+                // Verificar se o medicamento pertence ao usuário autenticado
+                var medicamentoParaExcluir = _context.MedicamentosApp.FirstOrDefault(m => m.Id == id && m.UserId == userId);
+                if (medicamentoParaExcluir == null)
+                {
+                    return NotFound($"Medicamento com ID {id} não encontrado ou não pertence ao usuário autenticado.");
+                }
 
+                // Excluir o medicamento
+                _context.MedicamentosApp.Remove(medicamentoParaExcluir);
                 _context.SaveChanges();
 
                 return Ok($"Medicamento com ID {id} foi excluído com sucesso.");
