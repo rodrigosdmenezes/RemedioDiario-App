@@ -10,7 +10,7 @@ export default function Menu({ navigation }) {
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState("");
   const [selectedType, setSelectedType] = useState("");
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedTime, setSelectedTime] = useState("");
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -28,7 +28,6 @@ export default function Menu({ navigation }) {
       }
     };
 
-    
     getToken();
   }, []);
 
@@ -39,7 +38,7 @@ export default function Menu({ navigation }) {
         Descricao: description,
         Quantidade: quantity,
         Tipo: selectedType,
-        Data: selectedDate.toLocaleDateString('pt-BR'),
+        Data: selectedDate ? selectedDate.toLocaleDateString('pt-BR') : null,
         Hora: selectedTime
       }, {
         headers: {
@@ -47,8 +46,6 @@ export default function Menu({ navigation }) {
         }
       });
       
-      console.log(token);
-
       if (response.status === 200) {
         Alert.alert("Sucesso", "Medicamento cadastrado com sucesso.");
       } else {
@@ -132,11 +129,11 @@ export default function Menu({ navigation }) {
         <View style={styles.inputContainer}>
           <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.buttonContainer}>
             <Icon name="calendar" size={20} color="#777" style={styles.icon} />
-            <Text style={styles.buttonText}>{selectedDate.toLocaleDateString('pt-BR')}</Text>
+            <Text style={styles.buttonText}>{selectedDate ? selectedDate.toLocaleDateString('pt-BR') : "Selecione a data"}</Text>
           </TouchableOpacity>
           {showDatePicker && (
             <DateTimePicker
-              value={selectedDate}
+              value={selectedDate || new Date()}
               mode="date"
               display="default"
               onChange={onChangeDate}
@@ -148,7 +145,7 @@ export default function Menu({ navigation }) {
         <View style={styles.inputContainer}>
           <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.buttonContainer}>
             <Icon name="clock" size={20} color="#777" style={styles.icon} />
-            <Text style={styles.buttonText}>{selectedTime}</Text>
+            <Text style={styles.buttonText}>{selectedTime ? selectedTime : "Selecione a hora"}</Text>
           </TouchableOpacity>
           {showTimePicker && (
             <DateTimePicker
@@ -173,7 +170,6 @@ export default function Menu({ navigation }) {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -203,11 +199,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
     marginBottom: 12,
   },
   input: {
@@ -220,20 +216,20 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   buttonText: {
     color: "#777",
     fontSize: 16,
     marginLeft: 5,
   },
-  buttonSave:{
-    color: '#FFF'
+  buttonSave: {
+    color: "#FFF",
   },
   buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
   },
   button: {
@@ -245,9 +241,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonSalvar: {
-    marginRight: '2%',
+    marginRight: "2%",
   },
   buttonVerMedicamentos: {
-    marginLeft: '2%',
+    marginLeft: "2%",
   },
 });
