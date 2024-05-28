@@ -1,17 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button, Platform } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import { Alert } from 'react-native';
-
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function Menu({ navigation }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState("");
   const [selectedType, setSelectedType] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedTime, setSelectedTime] = useState("");
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const handleSave = async () => {
     try {
@@ -20,7 +22,7 @@ export default function Menu({ navigation }) {
         Descricao: description,
         Quantidade: quantity,
         Tipo: selectedType,
-        Data: selectedDate,
+        Data: selectedDate.toLocaleDateString('pt-BR'), // Alterado para formato brasileiro
         Hora: selectedTime
       });
       if (response.status === 200) {
@@ -29,8 +31,24 @@ export default function Menu({ navigation }) {
         Alert.alert("Erro", "Erro ao cadastrar medicamento. Por favor, tente novamente.");
       }
     } catch (error) {
-      console.log(error)
+      console.error(error);
       Alert.alert("Erro", "Ocorreu um erro ao cadastrar medicamento. Por favor, tente novamente.");
+    }
+  };
+
+  const onChangeDate = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setSelectedDate(selectedDate);
+    }
+  };
+
+  const onChangeTime = (event, selectedTime) => {
+    setShowTimePicker(false);
+    if (selectedTime) {
+      const hours = selectedTime.getHours();
+      const minutes = selectedTime.getMinutes();
+      setSelectedTime(`${hours}:${minutes < 10 ? '0' + minutes : minutes}`);
     }
   };
 
@@ -88,33 +106,43 @@ export default function Menu({ navigation }) {
 
         <Text style={styles.title}>Data</Text>
         <View style={styles.inputContainer}>
-          <Icon name="calendar" size={20} color="#777" style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Selecione a data (DD/MM/AAAA)"
-            value={selectedDate}
-            onChangeText={setSelectedDate}
-          />
+          <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.buttonContainer}>
+            <Icon name="calendar" size={20} color="#777" style={styles.icon} />
+            <Text style={styles.buttonText}>{selectedDate.toLocaleDateString('pt-BR')}</Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              display="default"
+              onChange={onChangeDate}
+            />
+          )}
         </View>
 
         <Text style={styles.title}>Hora</Text>
         <View style={styles.inputContainer}>
-          <Icon name="clock-outline" size={20} color="#777" style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Selecione a hora (HH:MM)"
-            value={selectedTime}
-            onChangeText={setSelectedTime}
-          />
+          <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.buttonContainer}>
+            <Icon name="clock" size={20} color="#777" style={styles.icon} />
+            <Text style={styles.buttonText}>{selectedTime}</Text>
+          </TouchableOpacity>
+          {showTimePicker && (
+            <DateTimePicker
+              value={new Date()}
+              mode="time"
+              display="default"
+              onChange={onChangeTime}
+            />
+          )}
         </View>
 
         <View style={styles.buttonsContainer}>
           <TouchableOpacity style={[styles.button, styles.buttonSalvar]} onPress={handleSave}>
-            <Text style={styles.buttonText}>Salvar</Text>
+            <Text style={styles.buttonSave}>Salvar</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={[styles.button, styles.buttonVerMedicamentos]} onPress={() => navigation.navigate('ListMed')}>
-            <Text style={styles.buttonText}>Ver Medicamentos Cadastrados</Text>
+            <Text style={styles.buttonSave}>Ver Medicamentos Cadastrados</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -153,16 +181,31 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    marginBottom: 12,
   },
   input: {
-    borderBottomWidth: 1,
     height: 40,
-    marginBottom: 12,
     fontSize: 16,
     flex: 1,
+    paddingLeft: 10,
   },
   icon: {
     marginRight: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: "#777",
+    fontSize: 16,
+    marginLeft: 5,
+  },
+  buttonSave:{
+    color: '#FFF'
   },
   buttonsContainer: {
     flexDirection: 'row',
@@ -177,15 +220,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  buttonText: {
-    color: "#FFF",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
   buttonSalvar: {
     marginRight: '2%',
   },
   buttonVerMedicamentos: {
     marginLeft: '2%',
-  }
+  },
 });

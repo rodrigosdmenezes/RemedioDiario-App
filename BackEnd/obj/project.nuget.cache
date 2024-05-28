@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "02ry7w6PAY7+pryrbbBcHjVxJt5B4l9fQKh3dOOSnNKZWTZ9tQXSpgxa41crP0U9S0y7obxlmj3Y323CSTf5Jg==",
+  "dgSpecHash": "BPHTWQzOHyq9RJP0XAttKFyYKdlRJTlcoGkdJokv/by8/GLU+M5AVCiMHnUckBrY6/qXqkHnQQiBsPEvZrgstg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\rsouz\\RemedioDiario\\BackEnd\\RemedioDiario.csproj",
+  "projectFilePath": "C:\\Users\\rsouz\\RemedioDiario\\Backend\\RemedioDiario.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\rsouz\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\rsouz\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",

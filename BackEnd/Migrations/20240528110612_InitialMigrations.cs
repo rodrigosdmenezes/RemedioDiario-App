@@ -19,9 +19,10 @@ namespace RemedioDiario.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Descricao = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HoraTomar = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Comprimido = table.Column<bool>(type: "bit", nullable: false),
-                    Gotas = table.Column<bool>(type: "bit", nullable: false)
+                    Quantidade = table.Column<int>(type: "int", nullable: false),
+                    Tipo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Data = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Hora = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
